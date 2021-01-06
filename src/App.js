@@ -1,3 +1,4 @@
+import { without } from "lodash";
 import React, { Component } from "react";
 import AddAppointments from "./components/AddAppointments";
 import ListAppointments from "./components/ListAppointments";
@@ -11,7 +12,20 @@ export default class App extends Component {
       myAppointments: [],
       lastIndex: 0,
     };
+    //we are binding the this key word for our constructure, so it can be used in the method we specify
+    this.deleteAppointment = this.deleteAppointment.bind(this);
+    //so when deleteApp uses the this key word its able to use this object
   }
+
+  deleteAppointment(apt) {
+    let tempApts = this.state.myAppointments;
+    //lodash methoid without
+    //take an array feed, it a recored with something you want to delete.
+    tempApts = without(tempApts, apt);
+
+    this.setState({ myAppointments: tempApts });
+  }
+
   componentDidMount() {
     fetch("./data.json")
       .then((response) => response.json())
@@ -61,7 +75,10 @@ export default class App extends Component {
                   changeOrder={this.changeOrder}
                   searchApts={this.searchApts}
                 />
-                <ListAppointments appointments={this.state.myAppointments} />
+                <ListAppointments
+                  appointments={this.state.myAppointments}
+                  deleteAppointment={this.deleteAppointment}
+                />
               </div>
             </div>
           </div>
