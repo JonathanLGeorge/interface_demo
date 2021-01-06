@@ -15,6 +15,15 @@ export default class App extends Component {
     //we are binding the this key word for our constructure, so it can be used in the method we specify
     this.deleteAppointment = this.deleteAppointment.bind(this);
     //so when deleteApp uses the this key word its able to use this object
+
+    this.toggleForm = this.toggleForm.bind(this);
+    this.addAppointment = this.addAppointment.bind(this);
+  }
+
+  toggleForm() {
+    this.setState({
+      formDisplay: !this.state.formDisplay,
+    });
   }
 
   deleteAppointment(apt) {
@@ -24,6 +33,17 @@ export default class App extends Component {
     tempApts = without(tempApts, apt);
 
     this.setState({ myAppointments: tempApts });
+  }
+
+  addAppointment(apt) {
+    let tempApts = this.state.myAppointments;
+    apt.aptId = this.state.lastIndex;
+    //push element into the array
+    tempApts.unshift(apt); //unshift will pull apt at begining of array
+    this.setState({
+      myAppointments: tempApts, //new version of our array
+      lastIndex: this.state.lastIndex + 1, //update that index
+    });
   }
 
   componentDidMount() {
