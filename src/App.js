@@ -1,9 +1,9 @@
-import { without } from "lodash";
+import { without, findIndex } from "lodash";
 import React, { Component } from "react";
 import AddAppointments from "./components/AddAppointments";
 import ListAppointments from "./components/ListAppointments";
 import SearchAppointments from "./components/SearchAppointments";
-
+import "./css/App.css";
 export default class App extends Component {
   constructor(props) {
     super(props);
@@ -11,6 +11,10 @@ export default class App extends Component {
     this.state = {
       myAppointments: [],
       lastIndex: 0,
+      formDisplay: false,
+      orderBy: "petName",
+      orderDir: "asc",
+      queryText: "",
     };
     //we are binding the this key word for our constructure, so it can be used in the method we specify
     this.deleteAppointment = this.deleteAppointment.bind(this);
@@ -18,11 +22,25 @@ export default class App extends Component {
 
     this.toggleForm = this.toggleForm.bind(this);
     this.addAppointment = this.addAppointment.bind(this);
+    this.changeOrder = this.changeOrder.bind(this);
+    this.searchApts = this.searchApts.bind(this);
+    this.updateInfo = this.updateInfo.bind(this);
   }
 
   toggleForm() {
     this.setState({
       formDisplay: !this.state.formDisplay,
+    });
+  }
+
+  searchApts(query) {
+    this.setState({ queryText: query });
+  }
+
+  changeOrder(order, dir) {
+    this.setState({
+      orderBy: order,
+      orderDir: dir,
     });
   }
 
@@ -43,6 +61,16 @@ export default class App extends Component {
     this.setState({
       myAppointments: tempApts, //new version of our array
       lastIndex: this.state.lastIndex + 1, //update that index
+    });
+  }
+  updateInfo(name, value, id) {
+    let tempApts = this.state.myAppointments;
+    let aptIndex = findIndex(this.state.myAppointments, {
+      aptId: id,
+    });
+    tempApts[aptIndex][name] = value;
+    this.setState({
+      myAppointments: tempApts,
     });
   }
 
@@ -78,6 +106,40 @@ export default class App extends Component {
     
         */
     }
+
+    let order;
+    let filteredApts = this.state.myAppointments;
+    if (this.state.orderDir === "asc") {
+      order = 1;
+    } else {
+      order = -1;
+    }
+
+    filteredApts = filteredApts
+      .sort((a, b) => {
+        if (
+          a[this.state.orderBy].toLowerCase() <
+          b[this.state.orderBy].toLowerCase()
+        ) {
+          return -1 * order;
+        } else {
+          return 1 * order;
+        }
+      })
+      .filter((eachItem) => {
+        return (
+          eachItem["petName"]
+            .toLowerCase()
+            .includes(this.state.queryText.toLowerCase()) ||
+          eachItem["ownerName"]
+            .toLowerCase()
+            .includes(this.state.queryText.toLowerCase()) ||
+          eachItem["aptNotes"]
+            .toLowerCase()
+            .includes(this.state.queryText.toLowerCase())
+        );
+      });
+
     return (
       <main className="page bg-white" id="petratings">
         <div className="container">
@@ -96,8 +158,9 @@ export default class App extends Component {
                   searchApts={this.searchApts}
                 />
                 <ListAppointments
-                  appointments={this.state.myAppointments}
+                  appointments={filteredApts}
                   deleteAppointment={this.deleteAppointment}
+                  updateInfo={this.updateInfo}
                 />
               </div>
             </div>
