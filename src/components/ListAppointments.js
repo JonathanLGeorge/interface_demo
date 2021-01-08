@@ -2,6 +2,17 @@ import React, { Component } from "react";
 import { FaTimes } from "react-icons/fa";
 import Moment from "react-moment";
 
+/**
+ * contentEditable
+                  suppressContentEditableWarning
+                  onBlur={(e) =>
+                    this.props.updateInfo(
+                      "petName",
+                      e.target.innerText,
+                      item.aptId
+                    )
+                  }
+ */
 class ListAppointments extends Component {
   render() {
     return (
